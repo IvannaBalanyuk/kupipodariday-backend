@@ -31,9 +31,7 @@ export class User extends CommonEntity {
   @IsEmail()
   email: string;
 
-  @Column({
-    select: false,
-  })
+  @Column()
   @IsString()
   password: string;
 
