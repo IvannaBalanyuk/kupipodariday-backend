@@ -1,7 +1,8 @@
-import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToOne, ManyToMany } from 'typeorm';
 import {
   IsInt,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUrl,
@@ -11,6 +12,8 @@ import {
 import { CommonEntity } from 'src/common/common-entity';
 import { User } from 'src/users/entities/user.entity';
 import { Offer } from 'src/offers/entities/offer.entity';
+import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
+import { TUser } from 'src/common/types';
 
 @Entity()
 export class Wish extends CommonEntity {
@@ -53,6 +56,7 @@ export class Wish extends CommonEntity {
     },
   )
   @IsPositive()
+  @IsOptional()
   raised: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
@@ -63,6 +67,7 @@ export class Wish extends CommonEntity {
   @Length(1, 1024, {
     message: 'Допустимая длина поля description - не более 1024 символов',
   })
+  @IsOptional()
   description: string;
 
   @OneToMany(() => Offer, (offer) => offer.item)
@@ -71,5 +76,9 @@ export class Wish extends CommonEntity {
   @Column()
   @IsInt()
   @IsPositive()
+  @IsOptional()
   copied: number;
+
+  @ManyToMany(() => Wishlist, (wishlist) => wishlist.items)
+  wishlists: Wishlist[];
 }

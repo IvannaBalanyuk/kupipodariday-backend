@@ -1,10 +1,10 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { IsEmail, IsOptional, IsString, IsUrl, Length } from 'class-validator';
 
-import { CommonEntity } from 'src/common/common-entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
-import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
-import { Offer } from 'src/offers/entities/offer.entity';
+import { CommonEntity } from '../../common/common-entity';
+import { Wish } from '../../wishes/entities/wish.entity';
+import { Wishlist } from '../../wishlists/entities/wishlist.entity';
+import { Offer } from '../../offers/entities/offer.entity';
 
 @Entity()
 export class User extends CommonEntity {

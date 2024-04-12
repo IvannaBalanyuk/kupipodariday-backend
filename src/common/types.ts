@@ -1,9 +1,19 @@
-import { User } from '../users/entities/user.entity';
+export type TUser = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  username: string;
+  about: string;
+  avatar: string;
+  email?: string;
+  password?: string;
+};
 
-export type TNoPwdUser = Omit<User, 'password'>;
-
-export type TUserPayload = {
+export type TJwtPayload = {
   id: string;
   username: string;
 };
-export type TUserReq = { user: TUserPayload };
+
+export type TUserReq = { user: TJwtPayload };
+
+export type TToken = { access_token: string };

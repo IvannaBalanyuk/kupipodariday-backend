@@ -1,6 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 
-import { TNoPwdUser, TUserReq } from '../common/types';
+import { GUARDS } from '../auth/guards';
+import { TUserReq, TUser } from '../common/types';
 
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,23 +20,36 @@ import { FindUserDto } from './dto/find-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(GUARDS.jwtAuth)
   @Get('me')
-  findOwn(@Req() { user }: TUserReq): Promise<TNoPwdUser> {
-    return this.usersService.findById(user.id);
+  async findCurrUser(@Req() { user }: TUserReq): Promise<TUser> {
+    return await this.usersService.findOneBy(
+      { id: user.id },
+      { noPassword: true },
+    );
   }
 
+  @UseGuards(GUARDS.jwtAuth)
   @Patch('me')
-  update(@Req() { user }: TUserReq, @Body() dto: UpdateUserDto) {
-    return this.usersService.updateOne(user.id, dto);
+  async updateCurrUser(
+    @Req() { user }: TUserReq,
+    @Body() dto: UpdateUserDto,
+  ): Promise<TUser> {
+    return await this.usersService.updateOne(user.id, dto);
   }
 
+  @UseGuards(GUARDS.jwtAuth)
   @Get(':username')
-  findOne(@Param('username') username: string) {
-    return this.usersService.findOne(username);
+  async findOtherUser(@Param('username') username: string): Promise<TUser> {
+    return await this.usersService.findOneBy(
+      { username },
+      { noEmail: true, noPassword: true },
+    );
   }
 
+  @UseGuards(GUARDS.jwtAuth)
   @Post('find')
-  findMany(@Body() dto: FindUserDto) {
-    return this.usersService.findMany(dto.query);
+  async findOtherUsers(@Body() dto: FindUserDto): Promise<TUser[]> {
+    return await this.usersService.findMany(dto.query);
   }
 }

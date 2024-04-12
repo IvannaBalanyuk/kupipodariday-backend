@@ -30,7 +30,7 @@ export class Wishlist extends CommonEntity {
   @ManyToOne(() => User, (user) => user.wishes)
   owner: User;
 
-  @ManyToMany(() => Wish)
+  @ManyToMany(() => Wish, (wishlist) => wishlist.wishlists)
   @JoinTable()
   items: Wish[];
 }
