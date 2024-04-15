@@ -10,7 +10,6 @@ import { User } from '../users/entities/user.entity';
 import { Wish } from '../wishes/entities/wish.entity';
 import { Offer } from '../offers/entities/offer.entity';
 import { Wishlist } from '../wishlists/entities/wishlist.entity';
-import { number } from 'joi';
 
 export class ColumnNumericTransformer {
   to(data: number): number {
@@ -34,10 +33,10 @@ function prepareUserForRes(users: User[]): TUserFull[] {
       const preparedWishlists = this.prepareWishlistsForRes(wishlists);
 
       const preparedUser = {
+        ...rest,
         wishes: preparedWishes,
         offers: preparedOffers,
         wishlists: preparedWishlists,
-        ...rest,
       };
       return preparedUser;
     });
@@ -59,9 +58,9 @@ function prepareWishesForRes(wishes: Wish[]): TWishFull[] {
       const preparedOffers = this.prepareOffersForRes(offers);
 
       const preparedWish = {
+        ...rest,
         owner: preparedOwner,
         offers: preparedOffers,
-        ...rest,
       };
       return preparedWish;
     });
@@ -81,9 +80,9 @@ function prepareOffersForRes(offers: Offer[]): TOffer[] {
       const preparedItem = this.prepareWishesBaseForRes([item])[0];
 
       const preparedOffer = {
+        ...rest,
         user: preparedUser,
         item: preparedItem,
-        ...rest,
       };
       return preparedOffer;
     });
@@ -105,9 +104,9 @@ function prepareWishlistsForRes(wishlists: Wishlist[]): TWishlist[] {
       const preparedItems = this.prepareWishesBaseForRes(items);
 
       const preparedOffer = {
+        ...rest,
         owner: preparedOwner,
         items: preparedItems,
-        ...rest,
       };
       return preparedOffer;
     });

@@ -12,6 +12,6 @@ import { OffersController } from './offers.controller';
 @Module({
   imports: [TypeOrmModule.forFeature([Offer]), WishesModule, UsersModule],
   controllers: [OffersController],
-  providers: [OffersService, OffersRepository],
+  providers: [OffersRepository, OffersService],
 })
 export class OffersModule {}

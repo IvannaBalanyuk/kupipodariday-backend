@@ -41,6 +41,8 @@ export class UsersController {
 
   @Get('me/wishes')
   async getCurrUserWishes(@Req() { user }: TUserReq): Promise<TWishFull[]> {
+    console.log('getCurrUserWishes');
+    console.log(user);
     const wishes = await this.usersService.getUserWishes(user.username);
     return wishes;
   }

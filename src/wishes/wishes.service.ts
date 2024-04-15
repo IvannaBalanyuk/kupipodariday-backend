@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 
 import { TWishFull } from '../utils/types';
 import { UsersRepository } from '../users/users.repository';
@@ -72,6 +72,10 @@ export class WishesService {
   async findTop(): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findTop();
 
+    if (!wishes) {
+      throw new BadRequestException('Список подарков пока ещё пуст');
+    }
+
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
       return CommonMethods.prepareWishesForRes([wish])[0];
@@ -97,8 +101,12 @@ export class WishesService {
     try {
       const wish = await this.wishesRepository.findOne(id);
 
+      if (!wish) {
+        throw new BadRequestException('Подарок с таким id не найден');
+      }
+
       // Проверка на допустимость действия:
-      this.checkIsOwner(id, userId);
+      this.checkIsOwner(wish.owner.id, userId);
       if (dto.price) this.checkHasNoOffers(wish.offers.length);
 
       const updatedWish = await this.wishesRepository.update(id, dto);
@@ -115,8 +123,12 @@ export class WishesService {
     try {
       const wish = await this.wishesRepository.findOne(id);
 
+      if (!wish) {
+        throw new BadRequestException('Подарок с таким id не найден');
+      }
+
       // Проверка на допустимость действия:
-      this.checkIsOwner(id, userId);
+      this.checkIsOwner(wish.owner.id, userId);
       this.checkHasNoOffers(wish.offers.length);
 
       this.wishesRepository.removeOne(id);

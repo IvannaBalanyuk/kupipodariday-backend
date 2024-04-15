@@ -110,9 +110,11 @@ export class UsersRepository {
     return updatedUser;
   }
 
-  async isValueExist({ username, email }: TFindUserByArgs): Promise<boolean> {
-    return await this.repository.exists({
+  async isUserExist({ username, email }: TFindUserByArgs): Promise<boolean> {
+    const user = await this.repository.findOne({
       where: [{ username }, { email }],
     });
+    if (user) return true;
+    return false;
   }
 }

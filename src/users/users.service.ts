@@ -16,22 +16,27 @@ export class UsersService {
   ) {}
 
   async createUser(dto: CreateUserDto): Promise<TUserBase> {
-    const isUsernameExist = await this.usersRepository.isValueExist({
-      username: dto.username,
-    });
-    const isEmailExist = await this.usersRepository.isValueExist({
-      email: dto.email,
-    });
+    if (dto.username) {
+      const isUsernameExist = await this.usersRepository.isUserExist({
+        username: dto.username,
+      });
 
-    if (isUsernameExist) {
-      throw new BadRequestException(
-        `Имя пользователя ${dto.username} уже занято. Выберите другое имя пользователя`,
-      );
+      if (isUsernameExist) {
+        throw new BadRequestException(
+          `Имя пользователя ${dto.username} уже занято. Выберите другое имя пользователя`,
+        );
+      }
     }
-    if (isEmailExist) {
-      throw new BadRequestException(
-        `Пользователь с адресом электронной почты ${dto.email} уже зарегистрирован`,
-      );
+
+    if (dto.email) {
+      const isEmailExist = await this.usersRepository.isUserExist({
+        email: dto.email,
+      });
+      if (isEmailExist) {
+        throw new BadRequestException(
+          `Пользователь с адресом электронной почты ${dto.email} уже зарегистрирован`,
+        );
+      }
     }
 
     try {
@@ -92,7 +97,7 @@ export class UsersService {
     const user = await this.usersRepository.findOneBy({ id });
 
     if (dto.username && dto.username !== user.username) {
-      const isUsernameExist = await this.usersRepository.isValueExist({
+      const isUsernameExist = await this.usersRepository.isUserExist({
         username: dto.username,
       });
       if (isUsernameExist)
@@ -102,7 +107,7 @@ export class UsersService {
     }
 
     if (dto.email && dto.email !== user.email) {
-      const isEmailExist = await this.usersRepository.isValueExist({
+      const isEmailExist = await this.usersRepository.isUserExist({
         email: dto.email,
       });
       if (isEmailExist)

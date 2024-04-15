@@ -5,7 +5,6 @@ import { TOffer } from '../utils/types';
 import { CommonMethods } from '../utils/common-methods';
 import { UsersRepository } from '../users/users.repository';
 import { WishesRepository } from '../wishes/wishes.repository';
-import { Wish } from '../wishes/entities/wish.entity';
 import { UpdateWishDto } from '../wishes/dto/update-wish.dto';
 
 import { CreateOfferDto } from './dto/create-offer.dto';
@@ -21,10 +20,10 @@ export class OffersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async createOffer(userId: string, dto: CreateOfferDto): Promise<TOffer> {
+  async createOffer(userId: string, dto: CreateOfferDto): Promise<Offer> {
     try {
       const user = await this.usersRepository.findOneBy({ id: userId });
-      const wish: Wish = await this.wishesRepository.findOne(dto.itemId);
+      const wish = await this.wishesRepository.findOne(dto.itemId);
 
       // Проверка на допустимость действия:
       this.checkIsNotOwner(wish.owner.id, user.id);
@@ -34,14 +33,14 @@ export class OffersService {
         amount: dto.amount,
       });
 
+      const createdOffer = await this.offersRepository.create(dto, user, wish);
+      console.log('createdOffer', createdOffer);
+
       await this.wishesRepository.update(dto.itemId, {
         raised: wish.raised + dto.amount,
       } as UpdateWishDto);
-      const createdOffer = await this.offersRepository.create(dto, user, wish);
 
-      // Подготовка объекта для ответа сервера:
-      const offerForRes = CommonMethods.prepareOffersForRes([createdOffer])[0];
-      return offerForRes;
+      return createdOffer;
     } catch (err) {
       return err;
     }

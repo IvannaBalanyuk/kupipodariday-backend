@@ -13,6 +13,7 @@ import { TOffer, TUserReq } from '../utils/types';
 
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
+import { Offer } from './entities/offer.entity';
 
 @UseGuards(GUARDS.jwtAuth)
 @Controller('offers')
@@ -23,8 +24,9 @@ export class OffersController {
   async createOffer(
     @Body() dto: CreateOfferDto,
     @Req() { user }: TUserReq,
-  ): Promise<TOffer> {
+  ): Promise<Offer> {
     const offer = await this.offersService.createOffer(user.id, dto);
+    console.log('offer9', offer);
     return offer;
   }
 
