@@ -1,7 +1,7 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { IsEmail, IsOptional, IsString, IsUrl, Length } from 'class-validator';
 
-import { CommonEntity } from '../../common/common-entity';
+import { CommonEntity } from '../../utils/common-entity';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 import { Offer } from '../../offers/entities/offer.entity';

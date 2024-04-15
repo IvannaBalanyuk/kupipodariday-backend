@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { TWishlist } from '../utils/types';
-import { CommonService } from '../common/common.service';
+import { CommonMethods } from '../utils/common-methods';
 
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
@@ -18,7 +18,6 @@ export class WishlistsService {
     private readonly wishlistRepository: WishlistsRepository,
     private readonly usersRepository: UsersRepository,
     private readonly wishesRepository: WishesRepository,
-    private readonly commonService: CommonService,
   ) {}
 
   async createWishlist(
@@ -30,9 +29,7 @@ export class WishlistsService {
     const wishlist = await this.wishlistRepository.create(dto, owner, items);
 
     // Подготовка объекта для ответа сервера:
-    const wishlistForRes = this.commonService.prepareWishlistsForRes([
-      wishlist,
-    ])[0];
+    const wishlistForRes = CommonMethods.prepareWishlistsForRes([wishlist])[0];
     return wishlistForRes;
   }
 
@@ -41,7 +38,7 @@ export class WishlistsService {
       const wishlist = await this.wishlistRepository.findOne(id);
 
       // Подготовка объекта для ответа сервера:
-      const wishlistForRes = this.commonService.prepareWishlistsForRes([
+      const wishlistForRes = CommonMethods.prepareWishlistsForRes([
         wishlist,
       ])[0];
       return wishlistForRes;
@@ -54,8 +51,7 @@ export class WishlistsService {
     const wishlists = await this.wishlistRepository.findAll();
 
     // Подготовка объекта для ответа сервера:
-    const wishlistsForRes =
-      this.commonService.prepareWishlistsForRes(wishlists);
+    const wishlistsForRes = CommonMethods.prepareWishlistsForRes(wishlists);
     return wishlistsForRes;
   }
 
@@ -86,9 +82,7 @@ export class WishlistsService {
     }
 
     // Подготовка объекта для ответа сервера:
-    const wishlistForRes = this.commonService.prepareWishlistsForRes([
-      wishlist,
-    ])[0];
+    const wishlistForRes = CommonMethods.prepareWishlistsForRes([wishlist])[0];
     return wishlistForRes;
   }
 
@@ -100,9 +94,7 @@ export class WishlistsService {
 
     await this.wishlistRepository.removeOne(id);
     // Подготовка объекта для ответа сервера:
-    const wishlistForRes = this.commonService.prepareWishlistsForRes([
-      wishlist,
-    ])[0];
+    const wishlistForRes = CommonMethods.prepareWishlistsForRes([wishlist])[0];
     return wishlistForRes;
   }
 }

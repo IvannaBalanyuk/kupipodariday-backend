@@ -13,7 +13,6 @@ import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
-import { CommonModule } from './common/common.module';
 import { HashModule } from './hash/hash.module';
 import { AuthModule } from './auth/auth.module';
 
@@ -32,7 +31,6 @@ import { AuthModule } from './auth/auth.module';
     WishesModule,
     WishlistsModule,
     OffersModule,
-    CommonModule,
     HashModule,
     AuthModule,
   ],

@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne } from 'typeorm';
 import { IsNumber } from 'class-validator';
 
-import { CommonEntity } from 'src/common/common-entity';
+import { CommonEntity } from 'src/utils/common-entity';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
 

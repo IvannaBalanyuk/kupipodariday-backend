@@ -9,7 +9,7 @@ import {
   Length,
 } from 'class-validator';
 
-import { CommonEntity } from '../../common/common-entity';
+import { CommonEntity } from '../../utils/common-entity';
 import { User } from '../../users/entities/user.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { TOffer } from '../utils/types';
-import { CommonService } from '../common/common.service';
+import { CommonMethods } from '../utils/common-methods';
 import { UsersRepository } from '../users/users.repository';
 import { WishesRepository } from '../wishes/wishes.repository';
 import { Wish } from '../wishes/entities/wish.entity';
@@ -19,7 +19,6 @@ export class OffersService {
     private readonly offersRepository: OffersRepository,
     private readonly wishesRepository: WishesRepository,
     private readonly usersRepository: UsersRepository,
-    private readonly commonService: CommonService,
   ) {}
 
   async createOffer(userId: string, dto: CreateOfferDto): Promise<TOffer> {
@@ -28,8 +27,8 @@ export class OffersService {
       const wish: Wish = await this.wishesRepository.findOne(dto.itemId);
 
       // Проверка на допустимость действия:
-      this.commonService.checkIsNotOwner(wish.owner.id, user.id);
-      this.commonService.checkCanMakeOffer({
+      this.checkIsNotOwner(wish.owner.id, user.id);
+      this.checkCanMakeOffer({
         price: wish.price,
         raised: wish.raised,
         amount: dto.amount,
@@ -41,9 +40,7 @@ export class OffersService {
       const createdOffer = await this.offersRepository.create(dto, user, wish);
 
       // Подготовка объекта для ответа сервера:
-      const offerForRes = this.commonService.prepareOffersForRes([
-        createdOffer,
-      ])[0];
+      const offerForRes = CommonMethods.prepareOffersForRes([createdOffer])[0];
       return offerForRes;
     } catch (err) {
       return err;
@@ -52,13 +49,41 @@ export class OffersService {
 
   async getOffer(id: string): Promise<TOffer> {
     const offer = await this.offersRepository.findOne(id);
-    const offerForRes = this.commonService.prepareOffersForRes([offer])[0];
+    const offerForRes = CommonMethods.prepareOffersForRes([offer])[0];
     return offerForRes;
   }
 
   async getOffers(): Promise<TOffer[]> {
     const offers = await this.offersRepository.findAll();
-    const offersForRes = this.commonService.prepareOffersForRes(offers);
+    const offersForRes = CommonMethods.prepareOffersForRes(offers);
     return offersForRes;
+  }
+
+  private checkIsNotOwner(ownerId: string, userId: string): boolean | Error {
+    if (ownerId === userId) {
+      throw new ForbiddenException('На свои подарки донатить нельзя');
+    } else {
+      return true;
+    }
+  }
+
+  private checkCanMakeOffer({
+    price,
+    raised,
+    amount,
+  }: {
+    price: number;
+    raised: number;
+    amount: number;
+  }): boolean | Error {
+    if (price === raised) {
+      throw new ForbiddenException('На данный подарок уже собраны средства');
+    } else if (price < raised + amount) {
+      throw new ForbiddenException(
+        'Сумма собранных средств не может превышать стоимость подарка',
+      );
+    } else {
+      return true;
+    }
   }
 }

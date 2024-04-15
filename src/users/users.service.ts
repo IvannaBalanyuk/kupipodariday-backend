@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { CommonService } from '../common/common.service';
+import { CommonMethods } from '../utils/common-methods';
 import { HashHelper } from '../hash/hash.helper';
 import { TFindUserByArgs, TUserBase, TWishFull } from '../utils/types';
 
@@ -12,7 +12,6 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly commonService: CommonService,
     private readonly hashHelper: HashHelper,
   ) {}
 
@@ -37,7 +36,7 @@ export class UsersService {
 
     try {
       const user = await this.usersRepository.create(dto);
-      const userForRes = this.commonService.prepareUsersBaseForRes({
+      const userForRes = CommonMethods.prepareUsersBaseForRes({
         users: [user],
         withEmail: true,
       })[0];
@@ -54,7 +53,7 @@ export class UsersService {
   }: TFindUserByArgs): Promise<TUserBase> {
     try {
       const user = await this.usersRepository.findOneBy({ id, username });
-      const userForRes = this.commonService.prepareUsersBaseForRes({
+      const userForRes = CommonMethods.prepareUsersBaseForRes({
         users: [user],
         withEmail,
       })[0];
@@ -67,7 +66,7 @@ export class UsersService {
   async getUsersBy(query: string): Promise<TUserBase[]> {
     try {
       const users = await this.usersRepository.findMany(query);
-      const usersForRes = this.commonService.prepareUsersBaseForRes({ users });
+      const usersForRes = CommonMethods.prepareUsersBaseForRes({ users });
       return usersForRes;
     } catch (err) {
       return err;
@@ -82,7 +81,7 @@ export class UsersService {
       );
     }
     const wishes = await this.usersRepository.findUserWishes(username);
-    const wishesForRes = this.commonService.prepareWishesForRes(wishes);
+    const wishesForRes = CommonMethods.prepareWishesForRes(wishes);
     return wishesForRes;
   }
 
@@ -115,7 +114,7 @@ export class UsersService {
 
     try {
       const user = await this.usersRepository.updateOne(id, dto);
-      const userForRes = this.commonService.prepareUsersBaseForRes({
+      const userForRes = CommonMethods.prepareUsersBaseForRes({
         users: [user],
         withEmail: true,
       })[0];
