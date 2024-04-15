@@ -1,9 +1,9 @@
 import { Entity, Column, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
-import { IsString, IsUrl, Length } from 'class-validator';
+import { IsString, IsUrl, Length, MaxLength } from 'class-validator';
 
-import { CommonEntity } from 'src/common/common-entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
-import { User } from 'src/users/entities/user.entity';
+import { CommonEntity } from '../../common/common-entity';
+import { Wish } from '../../wishes/entities/wish.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Wishlist extends CommonEntity {
@@ -16,12 +16,13 @@ export class Wishlist extends CommonEntity {
 
   @Column()
   @IsString()
-  @Length(1, 1500, {
+  @MaxLength(1500, {
     message: 'Допустимая длина поля description - не более 1500 символов',
   })
   description: string;
 
   @Column()
+  @IsString()
   @IsUrl({
     message: 'Допустимое значение поля image - валидный url',
   })

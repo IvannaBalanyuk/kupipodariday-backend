@@ -1,83 +1,26 @@
-import {
-  EntityNotFoundError,
-  Like,
-  QueryFailedError,
-  Repository,
-} from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { CommonService } from '../common/common.service';
 import { HashHelper } from '../hash/hash.helper';
-import { TUser } from '../common/types';
+import { TFindUserByArgs, TUserBase, TWishFull } from '../utils/types';
 
-import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { validate } from 'class-validator';
-
-type TWhereArgs = {
-  id?: string;
-  username?: string;
-  email?: string;
-};
-
-type TSelectOptions = {
-  noEmail?: boolean;
-  noPassword?: boolean;
-};
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private hashHelper: HashHelper,
+    private readonly usersRepository: UsersRepository,
+    private readonly commonService: CommonService,
+    private readonly hashHelper: HashHelper,
   ) {}
 
-  private async isValueExist({
-    username,
-    email,
-  }: TWhereArgs): Promise<boolean> {
-    return await this.usersRepository.exists({
-      where: [{ username }, { email }],
-    });
-  }
-
-  async findOneBy(
-    { id, username }: TWhereArgs,
-    { noEmail = false, noPassword = false }: TSelectOptions,
-  ): Promise<TUser> {
-    try {
-      const user: TUser = await this.usersRepository.findOneOrFail({
-        select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          username: true,
-          about: true,
-          avatar: true,
-          email: noEmail ? false : true,
-          password: noPassword ? false : true,
-        },
-        where: [{ id }, { username }],
-      });
-      return user;
-    } catch (err) {
-      if (err instanceof EntityNotFoundError) {
-        throw new BadRequestException('Пользователь не найден');
-      }
-    }
-  }
-
-  async create(dto: CreateUserDto): Promise<TUser> {
-    const isUsernameExist = await this.isValueExist({
+  async createUser(dto: CreateUserDto): Promise<TUserBase> {
+    const isUsernameExist = await this.usersRepository.isValueExist({
       username: dto.username,
     });
-    const isEmailExist = await this.isValueExist({
+    const isEmailExist = await this.usersRepository.isValueExist({
       email: dto.email,
     });
 
@@ -92,58 +35,62 @@ export class UsersService {
       );
     }
 
-    const userInstance = this.usersRepository.create(dto);
-    const errors = await validate(userInstance);
-    if (errors.length > 0) {
-      const messages = errors.map((error) => error.constraints);
-      throw new BadRequestException(messages);
-    }
-
     try {
-      const { password, wishes, offers, wishlists, ...user } =
-        await this.usersRepository.save(userInstance);
-      return user;
+      const user = await this.usersRepository.create(dto);
+      const userForRes = this.commonService.prepareUsersBaseForRes({
+        users: [user],
+        withEmail: true,
+      })[0];
+      return userForRes;
     } catch (err) {
-      if (err instanceof QueryFailedError) {
-        const error = err.driverError;
-        if (error.code === '23505') {
-          throw new ConflictException(
-            'Пользователь с таким email или username уже зарегистрирован',
-          );
-        }
-      }
+      return err;
     }
   }
 
-  async findMany(query: string): Promise<TUser[]> {
+  async getUserBy({
+    id,
+    username,
+    withEmail = false,
+  }: TFindUserByArgs): Promise<TUserBase> {
     try {
-      return await this.usersRepository.find({
-        select: {
-          id: true,
-          username: true,
-          about: true,
-          avatar: true,
-          email: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        where: [
-          { username: Like(`%${query}%`) },
-          { email: Like(`%${query}%`) },
-        ],
-      });
+      const user = await this.usersRepository.findOneBy({ id, username });
+      const userForRes = this.commonService.prepareUsersBaseForRes({
+        users: [user],
+        withEmail,
+      })[0];
+      return userForRes;
     } catch (err) {
-      if (err instanceof EntityNotFoundError) {
-        throw new BadRequestException('Не найдено ни одного соответствия');
-      }
+      return err;
     }
   }
 
-  async updateOne(id: string, dto: UpdateUserDto): Promise<TUser> {
-    const user = await this.findOneBy({ id }, {});
+  async getUsersBy(query: string): Promise<TUserBase[]> {
+    try {
+      const users = await this.usersRepository.findMany(query);
+      const usersForRes = this.commonService.prepareUsersBaseForRes({ users });
+      return usersForRes;
+    } catch (err) {
+      return err;
+    }
+  }
+
+  async getUserWishes(username: string): Promise<TWishFull[]> {
+    const user = await this.usersRepository.findOneBy({ username });
+    if (!user) {
+      throw new BadRequestException(
+        `Пользователь с именем ${username} не найден`,
+      );
+    }
+    const wishes = await this.usersRepository.findUserWishes(username);
+    const wishesForRes = this.commonService.prepareWishesForRes(wishes);
+    return wishesForRes;
+  }
+
+  async updateUser(id: string, dto: UpdateUserDto): Promise<TUserBase> {
+    const user = await this.usersRepository.findOneBy({ id });
 
     if (dto.username && dto.username !== user.username) {
-      const isUsernameExist = await this.isValueExist({
+      const isUsernameExist = await this.usersRepository.isValueExist({
         username: dto.username,
       });
       if (isUsernameExist)
@@ -153,7 +100,7 @@ export class UsersService {
     }
 
     if (dto.email && dto.email !== user.email) {
-      const isEmailExist = await this.isValueExist({
+      const isEmailExist = await this.usersRepository.isValueExist({
         email: dto.email,
       });
       if (isEmailExist)
@@ -166,8 +113,15 @@ export class UsersService {
       dto.password = await this.hashHelper.getHash(dto.password);
     }
 
-    await this.usersRepository.update(id, dto);
-    const updatedUser = this.findOneBy({ id }, { noPassword: true });
-    return updatedUser;
+    try {
+      const user = await this.usersRepository.updateOne(id, dto);
+      const userForRes = this.commonService.prepareUsersBaseForRes({
+        users: [user],
+        withEmail: true,
+      })[0];
+      return userForRes;
+    } catch (err) {
+      return err;
+    }
   }
 }

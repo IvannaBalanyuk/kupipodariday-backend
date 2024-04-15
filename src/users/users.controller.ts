@@ -10,46 +10,60 @@ import {
 } from '@nestjs/common';
 
 import { GUARDS } from '../auth/guards';
-import { TUserReq, TUser } from '../common/types';
+import { TUserReq, TUserBase, TWishFull } from '../utils/types';
 
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 
+@UseGuards(GUARDS.jwtAuth)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(GUARDS.jwtAuth)
   @Get('me')
-  async findCurrUser(@Req() { user }: TUserReq): Promise<TUser> {
-    return await this.usersService.findOneBy(
-      { id: user.id },
-      { noPassword: true },
-    );
+  async getCurrUser(@Req() { user }: TUserReq): Promise<TUserBase> {
+    const currUser = await this.usersService.getUserBy({
+      id: user.id,
+      withEmail: true,
+    });
+    return currUser;
   }
 
-  @UseGuards(GUARDS.jwtAuth)
+  @Get(':username')
+  async getOtherUser(@Param('username') username: string): Promise<TUserBase> {
+    const currUser = await this.usersService.getUserBy({
+      username,
+    });
+    return currUser;
+  }
+
+  @Post('find')
+  async getOtherUsers(@Body() dto: FindUserDto): Promise<TUserBase[]> {
+    const users = await this.usersService.getUsersBy(dto.query);
+    return users;
+  }
+
+  @Get('me/wishes')
+  async getCurrUserWishes(@Req() { user }: TUserReq): Promise<TWishFull[]> {
+    const wishes = await this.usersService.getUserWishes(user.username);
+    return wishes;
+  }
+
+  @Get(':username/wishes')
+  async getOtherUserWishes(
+    @Param('username') username: string,
+  ): Promise<TWishFull[]> {
+    const wishes = await this.usersService.getUserWishes(username);
+    return wishes;
+  }
+
   @Patch('me')
   async updateCurrUser(
     @Req() { user }: TUserReq,
     @Body() dto: UpdateUserDto,
-  ): Promise<TUser> {
-    return await this.usersService.updateOne(user.id, dto);
-  }
-
-  @UseGuards(GUARDS.jwtAuth)
-  @Get(':username')
-  async findOtherUser(@Param('username') username: string): Promise<TUser> {
-    return await this.usersService.findOneBy(
-      { username },
-      { noEmail: true, noPassword: true },
-    );
-  }
-
-  @UseGuards(GUARDS.jwtAuth)
-  @Post('find')
-  async findOtherUsers(@Body() dto: FindUserDto): Promise<TUser[]> {
-    return await this.usersService.findMany(dto.query);
+  ): Promise<TUserBase> {
+    const updatedUser = await this.usersService.updateUser(user.id, dto);
+    return updatedUser;
   }
 }

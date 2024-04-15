@@ -1,6 +1,6 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import { Controller, Body, Req, Post, UseGuards } from '@nestjs/common';
 
-import { TJwtPayload, TToken, TUser } from '../common/types';
+import { TJwtPayload, TToken, TUserBase } from '../utils/types';
 
 import { AuthService } from './auth.service';
 import { GUARDS } from './guards';
@@ -11,13 +11,15 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  signup(@Body() dto: SignUpDto): Promise<TUser> {
-    return this.authService.signup(dto);
+  async signup(@Body() dto: SignUpDto): Promise<TUserBase> {
+    const user = await this.authService.signup(dto);
+    return user;
   }
 
   @UseGuards(GUARDS.localAuth)
   @Post('signin')
-  signin(@Request() req: { user: TJwtPayload }): Promise<TToken> {
-    return this.authService.signin(req.user);
+  async signin(@Req() req: { user: TJwtPayload }): Promise<TToken> {
+    const token = await this.authService.signin(req.user);
+    return token;
   }
 }
