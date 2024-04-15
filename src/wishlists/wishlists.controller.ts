@@ -31,16 +31,16 @@ export class WishlistsController {
     return wishlist;
   }
 
-  @Get(':id')
-  async getWishlist(@Param('id') id: string): Promise<TWishlist> {
-    const wishlist = await this.wishlistsService.getWishlist(id);
-    return wishlist;
-  }
-
   @Get()
   async getWishlists(): Promise<TWishlist[]> {
     const wishlists = await this.wishlistsService.getWishlists();
     return wishlists;
+  }
+
+  @Get(':id')
+  async getWishlist(@Param('id') id: string): Promise<TWishlist> {
+    const wishlist = await this.wishlistsService.getWishlist(id);
+    return wishlist;
   }
 
   @Patch(':id')

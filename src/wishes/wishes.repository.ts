@@ -21,6 +21,7 @@ export class WishesRepository {
       ...dto,
       owner: wishOwner,
     });
+
     const errors = await validate(wishInstance);
     if (errors.length > 0) {
       const messages = errors.map((error) => error.constraints);

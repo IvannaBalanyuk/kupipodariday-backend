@@ -12,5 +12,6 @@ import { WishesRepository } from './wishes.repository';
   imports: [TypeOrmModule.forFeature([Wish]), UsersModule],
   controllers: [WishesController],
   providers: [WishesService, WishesRepository],
+  exports: [WishesRepository],
 })
 export class WishesModule {}

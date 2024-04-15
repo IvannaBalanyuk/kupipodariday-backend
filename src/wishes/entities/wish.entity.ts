@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 
 import { CommonEntity } from '../../utils/common-entity';
+import { ColumnNumericTransformer } from '../../utils/common-methods';
 import { User } from '../../users/entities/user.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
@@ -35,7 +36,7 @@ export class Wish extends CommonEntity {
   })
   image: string;
 
-  @Column()
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   @IsNumber(
     { maxDecimalPlaces: 2 },
     {
@@ -46,7 +47,11 @@ export class Wish extends CommonEntity {
   @IsPositive()
   price: number;
 
-  @Column()
+  @Column({
+    type: 'numeric',
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   @IsNumber(
     { maxDecimalPlaces: 2 },
     {
@@ -72,7 +77,7 @@ export class Wish extends CommonEntity {
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
 
-  @Column()
+  @Column({ default: 0 })
   @IsInt()
   @IsPositive()
   @IsOptional()

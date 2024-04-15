@@ -31,13 +31,15 @@ export class WishesController {
     return res;
   }
 
-  @UseGuards(GUARDS.jwtAuth)
-  @Post(':id/copy')
-  async copyWish(
-    @Param('id') id: string,
-    @Req() { user }: TUserReq,
-  ): Promise<TWishFull> {
-    const res = await this.wishesService.copyWish(id, user.id);
+  @Get('last')
+  async getLastWishes(): Promise<TWishFull[]> {
+    const res = await this.wishesService.findLast();
+    return res;
+  }
+
+  @Get('top')
+  async getTopWishes(): Promise<TWishFull[]> {
+    const res = await this.wishesService.findTop();
     return res;
   }
 
@@ -45,18 +47,6 @@ export class WishesController {
   @Get(':id')
   async getWish(@Param('id') id: string): Promise<TWishFull> {
     const res = await this.wishesService.getWish(id);
-    return res;
-  }
-
-  @Get('last')
-  async getLastWishes(): Promise<TWishFull[]> {
-    const res = await this.wishesService.getLastWishes();
-    return res;
-  }
-
-  @Get('top')
-  async getTopWishes(): Promise<TWishFull[]> {
-    const res = await this.wishesService.getTopWishes();
     return res;
   }
 
@@ -78,6 +68,16 @@ export class WishesController {
     @Req() { user }: TUserReq,
   ): Promise<TWishFull> {
     const res = await this.wishesService.removeWish(id, user.id);
+    return res;
+  }
+
+  @UseGuards(GUARDS.jwtAuth)
+  @Post(':id/copy')
+  async copyWish(
+    @Param('id') id: string,
+    @Req() { user }: TUserReq,
+  ): Promise<TWishFull> {
+    const res = await this.wishesService.copyWish(id, user.id);
     return res;
   }
 }

@@ -66,7 +66,10 @@ export class UsersService {
   async getUsersBy(query: string): Promise<TUserBase[]> {
     try {
       const users = await this.usersRepository.findMany(query);
-      const usersForRes = CommonMethods.prepareUsersBaseForRes({ users });
+      const usersForRes = CommonMethods.prepareUsersBaseForRes({
+        users,
+        withEmail: true,
+      });
       return usersForRes;
     } catch (err) {
       return err;

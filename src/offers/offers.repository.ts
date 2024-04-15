@@ -11,7 +11,7 @@ import { CreateOfferDto } from './dto/create-offer.dto';
 @Injectable()
 export class OffersRepository {
   constructor(
-    @InjectRepository(Wish)
+    @InjectRepository(Offer)
     private readonly repository: Repository<Offer>,
   ) {}
 

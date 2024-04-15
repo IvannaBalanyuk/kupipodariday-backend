@@ -28,15 +28,15 @@ export class OffersController {
     return offer;
   }
 
-  @Get(':id')
-  async getOffer(@Param('id') id: string): Promise<TOffer> {
-    const offer = await this.offersService.getOffer(id);
-    return offer;
-  }
-
   @Get()
   async getOffers(): Promise<TOffer[]> {
     const offers = await this.offersService.getOffers();
     return offers;
+  }
+
+  @Get(':id')
+  async getOffer(@Param('id') id: string): Promise<TOffer> {
+    const offer = await this.offersService.getOffer(id);
+    return offer;
   }
 }

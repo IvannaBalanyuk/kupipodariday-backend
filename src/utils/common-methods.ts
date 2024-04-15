@@ -10,6 +10,16 @@ import { User } from '../users/entities/user.entity';
 import { Wish } from '../wishes/entities/wish.entity';
 import { Offer } from '../offers/entities/offer.entity';
 import { Wishlist } from '../wishlists/entities/wishlist.entity';
+import { number } from 'joi';
+
+export class ColumnNumericTransformer {
+  to(data: number): number {
+    return data;
+  }
+  from(data: string): number {
+    return parseFloat(data);
+  }
+}
 
 // Функции для подготовки данных к отправке на клиент
 
@@ -41,18 +51,16 @@ function prepareWishesForRes(wishes: Wish[]): TWishFull[] {
   let preparedWishes: TWishFull[];
   if (wishes.length > 0) {
     preparedWishes = wishes.map((wish) => {
-      const { owner, offers, wishlists, ...rest } = wish;
+      const { owner, offers, ...rest } = wish;
 
       const preparedOwner = this.prepareUsersBaseForRes({
         users: [owner],
       })[0];
       const preparedOffers = this.prepareOffersForRes(offers);
-      const preparedWishlists = this.prepareWishlistsForRes(wishlists);
 
       const preparedWish = {
         owner: preparedOwner,
         offers: preparedOffers,
-        wishlists: preparedWishlists,
         ...rest,
       };
       return preparedWish;
@@ -65,7 +73,7 @@ function prepareWishesForRes(wishes: Wish[]): TWishFull[] {
 
 function prepareOffersForRes(offers: Offer[]): TOffer[] {
   let preparedOffers: TOffer[];
-  if (offers.length > 0) {
+  if (offers instanceof Array && offers.length > 0) {
     preparedOffers = offers.map((offer) => {
       const { user, item, ...rest } = offer;
 
@@ -123,7 +131,7 @@ function prepareUsersBaseForRes({
         user;
 
       if (withEmail) {
-        return { email, ...preparedUser };
+        return { ...preparedUser, email };
       } else {
         return preparedUser;
       }

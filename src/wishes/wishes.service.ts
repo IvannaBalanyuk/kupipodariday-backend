@@ -18,9 +18,9 @@ export class WishesService {
 
   async createWish(userId: string, dto: CreateWishDto): Promise<TWishFull> {
     try {
-      // Обращение к базе данных (через сервис):
       const owner = await this.usersRepository.findOneBy({ id: userId });
       const createdWish = await this.wishesRepository.create(dto, owner);
+
       // Подготовка объекта для ответа сервера:
       const wishForRes = CommonMethods.prepareWishesForRes([createdWish])[0];
       return wishForRes;
@@ -31,6 +31,7 @@ export class WishesService {
 
   async copyWish(wishId: string, userId: string): Promise<TWishFull> {
     const owner = await this.usersRepository.findOneBy({ id: userId });
+
     // Проверка на допустимость действия:
     const hasThatWish = owner.wishes.find((wish: Wish) => wish.id === wishId);
     if (hasThatWish) {
@@ -38,8 +39,9 @@ export class WishesService {
         'Этот подарок уже есть в Вашем списке подарков',
       );
     }
-    // Обращение к базе данных (через сервис):
+
     const copiedWish = await this.wishesRepository.copy(wishId, owner);
+
     // Подготовка объекта для ответа сервера:
     const wishForRes = CommonMethods.prepareWishesForRes([copiedWish])[0];
     return wishForRes;
@@ -47,8 +49,8 @@ export class WishesService {
 
   async getWish(id: string): Promise<TWishFull> {
     try {
-      // Обращение к базе данных (через сервис):
       const wish = await this.wishesRepository.findOne(id);
+
       // Подготовка объекта для ответа сервера:
       const wishForRes = CommonMethods.prepareWishesForRes([wish])[0];
       return wishForRes;
@@ -57,9 +59,9 @@ export class WishesService {
     }
   }
 
-  async getLastWishes(): Promise<TWishFull[]> {
-    // Обращение к базе данных (через сервис):
+  async findLast(): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findLast();
+
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
       return CommonMethods.prepareWishesForRes([wish])[0];
@@ -67,9 +69,9 @@ export class WishesService {
     return wishesForRes;
   }
 
-  async getTopWishes(): Promise<TWishFull[]> {
-    // Обращение к базе данных (через сервис):
+  async findTop(): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findTop();
+
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
       return CommonMethods.prepareWishesForRes([wish])[0];
@@ -78,8 +80,8 @@ export class WishesService {
   }
 
   async getWishes(wishIds: number[]): Promise<TWishFull[]> {
-    // Обращение к базе данных (через сервис):
     const wishes = await this.wishesRepository.findMany(wishIds);
+
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
       return CommonMethods.prepareWishesForRes([wish])[0];
@@ -94,11 +96,13 @@ export class WishesService {
   ): Promise<TWishFull> {
     try {
       const wish = await this.wishesRepository.findOne(id);
+
       // Проверка на допустимость действия:
       this.checkIsOwner(id, userId);
       if (dto.price) this.checkHasNoOffers(wish.offers.length);
-      // Обращение к базе данных (через сервис):
+
       const updatedWish = await this.wishesRepository.update(id, dto);
+
       // Подготовка объекта для ответа сервера:
       const wishForRes = CommonMethods.prepareWishesForRes([updatedWish])[0];
       return wishForRes;
@@ -110,11 +114,13 @@ export class WishesService {
   async removeWish(id: string, userId: string): Promise<TWishFull> {
     try {
       const wish = await this.wishesRepository.findOne(id);
+
       // Проверка на допустимость действия:
       this.checkIsOwner(id, userId);
       this.checkHasNoOffers(wish.offers.length);
-      // Обращение к базе данных (через сервис):
+
       this.wishesRepository.removeOne(id);
+
       // Подготовка объекта для ответа сервера:
       const wishForRes = CommonMethods.prepareWishesForRes([wish])[0];
       return wishForRes;

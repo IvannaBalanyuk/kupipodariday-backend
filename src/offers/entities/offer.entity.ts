@@ -13,7 +13,7 @@ export class Offer extends CommonEntity {
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
 
-  @Column()
+  @Column({ type: 'numeric' })
   @IsNumber(
     { maxDecimalPlaces: 2 },
     {

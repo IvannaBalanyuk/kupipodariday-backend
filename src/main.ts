@@ -18,6 +18,8 @@ async function bootstrap() {
       skipMissingProperties: true,
     }),
   );
-  await app.listen(port);
+  await app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
+  });
 }
 bootstrap();

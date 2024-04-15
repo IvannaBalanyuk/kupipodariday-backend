@@ -14,6 +14,7 @@ import { validate } from 'class-validator';
 
 import { TFindUserByArgs } from '../utils/types';
 import { Wish } from '../wishes/entities/wish.entity';
+import { HashHelper } from '../hash/hash.helper';
 
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,6 +25,7 @@ export class UsersRepository {
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>,
+    private readonly hashHelper: HashHelper,
   ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -33,6 +35,8 @@ export class UsersRepository {
       const messages = errors.map((error) => error.constraints);
       throw new BadRequestException(messages);
     }
+
+    userInstance.password = await this.hashHelper.getHash(dto.password);
 
     try {
       const user = await this.repository.save(userInstance);

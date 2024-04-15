@@ -30,18 +30,13 @@ export class UsersController {
     return currUser;
   }
 
-  @Get(':username')
-  async getOtherUser(@Param('username') username: string): Promise<TUserBase> {
-    const currUser = await this.usersService.getUserBy({
-      username,
-    });
-    return currUser;
-  }
-
-  @Post('find')
-  async getOtherUsers(@Body() dto: FindUserDto): Promise<TUserBase[]> {
-    const users = await this.usersService.getUsersBy(dto.query);
-    return users;
+  @Patch('me')
+  async updateCurrUser(
+    @Req() { user }: TUserReq,
+    @Body() dto: UpdateUserDto,
+  ): Promise<TUserBase> {
+    const updatedUser = await this.usersService.updateUser(user.id, dto);
+    return updatedUser;
   }
 
   @Get('me/wishes')
@@ -50,20 +45,25 @@ export class UsersController {
     return wishes;
   }
 
+  @Post('find')
+  async getOtherUsers(@Body() dto: FindUserDto): Promise<TUserBase[]> {
+    const users = await this.usersService.getUsersBy(dto.query);
+    return users;
+  }
+
+  @Get(':username')
+  async getOtherUser(@Param('username') username: string): Promise<TUserBase> {
+    const currUser = await this.usersService.getUserBy({
+      username,
+    });
+    return currUser;
+  }
+
   @Get(':username/wishes')
   async getOtherUserWishes(
     @Param('username') username: string,
   ): Promise<TWishFull[]> {
     const wishes = await this.usersService.getUserWishes(username);
     return wishes;
-  }
-
-  @Patch('me')
-  async updateCurrUser(
-    @Req() { user }: TUserReq,
-    @Body() dto: UpdateUserDto,
-  ): Promise<TUserBase> {
-    const updatedUser = await this.usersService.updateUser(user.id, dto);
-    return updatedUser;
   }
 }
