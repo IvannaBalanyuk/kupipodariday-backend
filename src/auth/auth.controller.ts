@@ -6,7 +6,6 @@ import { TJwtPayload, TToken, TUserBase } from '../utils/types';
 import { AuthService } from './auth.service';
 import { GUARDS } from './guards';
 import { SignUpDto } from './dto/signup.dto';
-import { SignInDto } from './dto/signin.dto';
 
 @ApiTags('Auth')
 @Controller()
