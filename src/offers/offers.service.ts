@@ -24,7 +24,7 @@ export class OffersService {
 
   async createOffer(userId: string, dto: CreateOfferDto): Promise<TOffer> {
     try {
-      const user = await this.usersRepository.findOneBy({ id: userId });
+      const user = await this.usersRepository.findOneBy({ userId });
       const wish = await this.wishesRepository.findOne(dto.itemId);
 
       // Проверка на допустимость действия:
@@ -41,32 +41,38 @@ export class OffersService {
         raised: wish.raised + dto.amount,
       } as UpdateWishDto);
 
-      const offerForRes = CommonMethods.prepareOffersForRes([createdOffer])[0];
+      const offerForRes = CommonMethods.prepareOffersForRes({
+        offers: [createdOffer],
+        userId,
+      })[0];
       return offerForRes;
     } catch (err) {
       return err;
     }
   }
 
-  async getOffer(id: string): Promise<TOffer> {
+  async getOffer(id: string, userId: string): Promise<TOffer> {
     const offer = await this.offersRepository.findOne(id);
 
     if (!offer) {
       throw new BadRequestException('Оффер с таким id не найден');
     }
 
-    const offerForRes = CommonMethods.prepareOffersForRes([offer])[0];
+    const offerForRes = CommonMethods.prepareOffersForRes({
+      offers: [offer],
+      userId,
+    })[0];
     return offerForRes;
   }
 
-  async getOffers(): Promise<TOffer[]> {
+  async getOffers(userId: string): Promise<TOffer[]> {
     const offers = await this.offersRepository.findAll();
 
     if (!offers) {
       throw new BadRequestException('Не найдено ни одного оффера');
     }
 
-    const offersForRes = CommonMethods.prepareOffersForRes(offers);
+    const offersForRes = CommonMethods.prepareOffersForRes({ offers, userId });
     return offersForRes;
   }
 

@@ -43,7 +43,7 @@ export class UsersService {
       const user = await this.usersRepository.create(dto);
       const userForRes = CommonMethods.prepareUsersBaseForRes({
         users: [user],
-        withEmail: true,
+        userId: user.id,
       })[0];
       return userForRes;
     } catch (err) {
@@ -51,16 +51,12 @@ export class UsersService {
     }
   }
 
-  async getUserBy({
-    id,
-    username,
-    withEmail = false,
-  }: TFindUserByArgs): Promise<TUserBase> {
+  async getUserBy({ userId, username }: TFindUserByArgs): Promise<TUserBase> {
     try {
-      const user = await this.usersRepository.findOneBy({ id, username });
+      const user = await this.usersRepository.findOneBy({ userId, username });
       const userForRes = CommonMethods.prepareUsersBaseForRes({
         users: [user],
-        withEmail,
+        userId,
       })[0];
       return userForRes;
     } catch (err) {
@@ -68,12 +64,12 @@ export class UsersService {
     }
   }
 
-  async getUsersBy(query: string): Promise<TUserBase[]> {
+  async getUsersBy(query: string, userId: string): Promise<TUserBase[]> {
     try {
       const users = await this.usersRepository.findMany(query);
       const usersForRes = CommonMethods.prepareUsersBaseForRes({
         users,
-        withEmail: true,
+        userId,
       });
       return usersForRes;
     } catch (err) {
@@ -81,7 +77,7 @@ export class UsersService {
     }
   }
 
-  async getUserWishes(username: string): Promise<TWishFull[]> {
+  async getUserWishes(username: string, userId: string): Promise<TWishFull[]> {
     const user = await this.usersRepository.findOneBy({ username });
     if (!user) {
       throw new BadRequestException(
@@ -89,12 +85,12 @@ export class UsersService {
       );
     }
     const wishes = await this.usersRepository.findUserWishes(username);
-    const wishesForRes = CommonMethods.prepareWishesForRes(wishes);
+    const wishesForRes = CommonMethods.prepareWishesForRes({ wishes, userId });
     return wishesForRes;
   }
 
-  async updateUser(id: string, dto: UpdateUserDto): Promise<TUserBase> {
-    const user = await this.usersRepository.findOneBy({ id });
+  async updateUser(userId: string, dto: UpdateUserDto): Promise<TUserBase> {
+    const user = await this.usersRepository.findOneBy({ userId });
 
     if (dto.username && dto.username !== user.username) {
       const isUsernameExist = await this.usersRepository.isUserExist({
@@ -121,10 +117,10 @@ export class UsersService {
     }
 
     try {
-      const user = await this.usersRepository.updateOne(id, dto);
+      const user = await this.usersRepository.updateOne(userId, dto);
       const userForRes = CommonMethods.prepareUsersBaseForRes({
         users: [user],
-        withEmail: true,
+        userId,
       })[0];
       return userForRes;
     } catch (err) {

@@ -22,11 +22,14 @@ export class WishesService {
 
   async createWish(userId: string, dto: CreateWishDto): Promise<TWishFull> {
     try {
-      const owner = await this.usersRepository.findOneBy({ id: userId });
+      const owner = await this.usersRepository.findOneBy({ userId });
       const createdWish = await this.wishesRepository.create(dto, owner);
 
       // Подготовка объекта для ответа сервера:
-      const wishForRes = CommonMethods.prepareWishesForRes([createdWish])[0];
+      const wishForRes = CommonMethods.prepareWishesForRes({
+        wishes: [createdWish],
+        userId,
+      })[0];
       return wishForRes;
     } catch (err) {
       return err;
@@ -34,7 +37,7 @@ export class WishesService {
   }
 
   async copyWish(wishId: string, userId: string): Promise<TWishFull> {
-    const owner = await this.usersRepository.findOneBy({ id: userId });
+    const owner = await this.usersRepository.findOneBy({ userId });
 
     // Проверка на допустимость действия:
     const hasThatWish = owner.wishes.find((wish: Wish) => wish.id === wishId);
@@ -47,33 +50,39 @@ export class WishesService {
     const copiedWish = await this.wishesRepository.copy(wishId, owner);
 
     // Подготовка объекта для ответа сервера:
-    const wishForRes = CommonMethods.prepareWishesForRes([copiedWish])[0];
+    const wishForRes = CommonMethods.prepareWishesForRes({
+      wishes: [copiedWish],
+      userId,
+    })[0];
     return wishForRes;
   }
 
-  async getWish(id: string): Promise<TWishFull> {
+  async getWish(id: string, userId: string): Promise<TWishFull> {
     try {
       const wish = await this.wishesRepository.findOne(id);
 
       // Подготовка объекта для ответа сервера:
-      const wishForRes = CommonMethods.prepareWishesForRes([wish])[0];
+      const wishForRes = CommonMethods.prepareWishesForRes({
+        wishes: [wish],
+        userId,
+      })[0];
       return wishForRes;
     } catch (err) {
       return err;
     }
   }
 
-  async findLast(): Promise<TWishFull[]> {
+  async findLast(userId: string): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findLast();
 
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
-      return CommonMethods.prepareWishesForRes([wish])[0];
+      return CommonMethods.prepareWishesForRes({ wishes: [wish], userId })[0];
     });
     return wishesForRes;
   }
 
-  async findTop(): Promise<TWishFull[]> {
+  async findTop(userId: string): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findTop();
 
     if (!wishes) {
@@ -82,17 +91,17 @@ export class WishesService {
 
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
-      return CommonMethods.prepareWishesForRes([wish])[0];
+      return CommonMethods.prepareWishesForRes({ wishes: [wish], userId })[0];
     });
     return wishesForRes;
   }
 
-  async getWishes(wishIds: string[]): Promise<TWishFull[]> {
+  async getWishes(wishIds: string[], userId: string): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findMany(wishIds);
 
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
-      return CommonMethods.prepareWishesForRes([wish])[0];
+      return CommonMethods.prepareWishesForRes({ wishes: [wish], userId })[0];
     });
     return wishesForRes;
   }
@@ -116,7 +125,10 @@ export class WishesService {
       const updatedWish = await this.wishesRepository.update(id, dto);
 
       // Подготовка объекта для ответа сервера:
-      const wishForRes = CommonMethods.prepareWishesForRes([updatedWish])[0];
+      const wishForRes = CommonMethods.prepareWishesForRes({
+        wishes: [updatedWish],
+        userId,
+      })[0];
       return wishForRes;
     } catch (err) {
       return err;
@@ -138,7 +150,10 @@ export class WishesService {
       this.wishesRepository.removeOne(id);
 
       // Подготовка объекта для ответа сервера:
-      const wishForRes = CommonMethods.prepareWishesForRes([wish])[0];
+      const wishForRes = CommonMethods.prepareWishesForRes({
+        wishes: [wish],
+        userId,
+      })[0];
       return wishForRes;
     } catch (err) {
       return err;

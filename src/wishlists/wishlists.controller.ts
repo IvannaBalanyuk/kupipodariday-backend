@@ -32,14 +32,17 @@ export class WishlistsController {
   }
 
   @Get()
-  async getWishlists(): Promise<TWishlist[]> {
-    const wishlists = await this.wishlistsService.getWishlists();
+  async getWishlists(@Req() { user }: TUserReq): Promise<TWishlist[]> {
+    const wishlists = await this.wishlistsService.getWishlists(user.id);
     return wishlists;
   }
 
   @Get(':id')
-  async getWishlist(@Param('id') id: string): Promise<TWishlist> {
-    const wishlist = await this.wishlistsService.getWishlist(id);
+  async getWishlist(
+    @Param('id') id: string,
+    @Req() { user }: TUserReq,
+  ): Promise<TWishlist> {
+    const wishlist = await this.wishlistsService.getWishlist(id, user.id);
     return wishlist;
   }
 

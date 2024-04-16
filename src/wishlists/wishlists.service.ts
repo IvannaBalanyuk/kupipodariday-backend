@@ -22,34 +22,41 @@ export class WishlistsService {
     dto: CreateWishlistDto,
     userId: string,
   ): Promise<TWishlist> {
-    const owner = await this.usersRepository.findOneBy({ id: userId });
+    const owner = await this.usersRepository.findOneBy({ userId });
     const items = await this.wishesRepository.findMany(dto.itemsId);
     const wishlist = await this.wishlistRepository.create(dto, owner, items);
 
     // Подготовка объекта для ответа сервера:
-    const wishlistForRes = CommonMethods.prepareWishlistsForRes([wishlist])[0];
+    const wishlistForRes = CommonMethods.prepareWishlistsForRes({
+      wishlists: [wishlist],
+      userId,
+    })[0];
     return wishlistForRes;
   }
 
-  async getWishlist(id: string): Promise<TWishlist> {
+  async getWishlist(id: string, userId: string): Promise<TWishlist> {
     try {
       const wishlist = await this.wishlistRepository.findOne(id);
 
       // Подготовка объекта для ответа сервера:
-      const wishlistForRes = CommonMethods.prepareWishlistsForRes([
-        wishlist,
-      ])[0];
+      const wishlistForRes = CommonMethods.prepareWishlistsForRes({
+        wishlists: [wishlist],
+        userId,
+      })[0];
       return wishlistForRes;
     } catch (err) {
       return err;
     }
   }
 
-  async getWishlists(): Promise<TWishlist[]> {
+  async getWishlists(userId: string): Promise<TWishlist[]> {
     const wishlists = await this.wishlistRepository.findAll();
 
     // Подготовка объекта для ответа сервера:
-    const wishlistsForRes = CommonMethods.prepareWishlistsForRes(wishlists);
+    const wishlistsForRes = CommonMethods.prepareWishlistsForRes({
+      wishlists,
+      userId,
+    });
     return wishlistsForRes;
   }
 
@@ -80,7 +87,10 @@ export class WishlistsService {
     }
 
     // Подготовка объекта для ответа сервера:
-    const wishlistForRes = CommonMethods.prepareWishlistsForRes([wishlist])[0];
+    const wishlistForRes = CommonMethods.prepareWishlistsForRes({
+      wishlists: [wishlist],
+      userId,
+    })[0];
     return wishlistForRes;
   }
 
@@ -92,7 +102,10 @@ export class WishlistsService {
 
     await this.wishlistRepository.removeOne(id);
     // Подготовка объекта для ответа сервера:
-    const wishlistForRes = CommonMethods.prepareWishlistsForRes([wishlist])[0];
+    const wishlistForRes = CommonMethods.prepareWishlistsForRes({
+      wishlists: [wishlist],
+      userId,
+    })[0];
     return wishlistForRes;
   }
 }

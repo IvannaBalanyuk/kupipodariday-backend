@@ -8,10 +8,9 @@ export type TUserReq = { user: TJwtPayload };
 export type TToken = { access_token: string };
 
 export type TFindUserByArgs = {
-  id?: string;
+  userId?: string;
   username?: string;
   email?: string;
-  withEmail?: boolean;
 };
 
 export type TUserBase = {

@@ -22,15 +22,24 @@ export class ColumnNumericTransformer {
 
 // Функции для подготовки данных к отправке на клиент
 
-function prepareUserForRes(users: User[]): TUserFull[] {
+function prepareUserForRes({
+  users,
+  userId,
+}: {
+  users: User[];
+  userId: string;
+}): TUserFull[] {
   let preparedUsers: TUserFull[];
   if (users.length > 0) {
     preparedUsers = users.map((user) => {
       const { wishes, offers, wishlists, ...rest } = user;
 
       const preparedWishes = this.prepareWishesBaseForRes(wishes);
-      const preparedOffers = this.prepareOffersForRes(offers);
-      const preparedWishlists = this.prepareWishlistsForRes(wishlists);
+      const preparedOffers = this.prepareOffersForRes({ offers, userId });
+      const preparedWishlists = this.prepareWishlistsForRes({
+        wishlists,
+        userId,
+      });
 
       const preparedUser = {
         ...rest,
@@ -46,15 +55,22 @@ function prepareUserForRes(users: User[]): TUserFull[] {
   return preparedUsers;
 }
 
-function prepareWishesForRes(wishes: Wish[]): TWishFull[] {
+function prepareWishesForRes({
+  wishes,
+  userId,
+}: {
+  wishes: Wish[];
+  userId: string;
+}): TWishFull[] {
   let preparedWishes: TWishFull[];
   if (wishes.length > 0) {
     preparedWishes = wishes.map((wish) => {
       const { owner, offers, ...rest } = wish;
       const preparedOwner = this.prepareUsersBaseForRes({
         users: [owner],
+        userId,
       })[0];
-      const preparedOffers = this.prepareOffersForRes(offers);
+      const preparedOffers = this.prepareOffersForRes({ offers, userId });
 
       const preparedWish = {
         ...rest,
@@ -69,12 +85,21 @@ function prepareWishesForRes(wishes: Wish[]): TWishFull[] {
   return preparedWishes;
 }
 
-function prepareOffersForRes(offers: Offer[]): TOffer[] {
+function prepareOffersForRes({
+  offers,
+  userId,
+}: {
+  offers: Offer[];
+  userId: string;
+}): TOffer[] {
   let preparedOffers: TOffer[];
   if (offers instanceof Array && offers.length > 0) {
     preparedOffers = offers.map((offer) => {
       const { user, item, ...rest } = offer;
-      const preparedUser = this.prepareUsersBaseForRes({ users: [user] })[0];
+      const preparedUser = this.prepareUsersBaseForRes({
+        users: [user],
+        userId,
+      })[0];
       const preparedItem = this.prepareWishesBaseForRes([item])[0];
 
       const preparedOffer = {
@@ -82,6 +107,11 @@ function prepareOffersForRes(offers: Offer[]): TOffer[] {
         user: preparedUser,
         item: preparedItem,
       };
+
+      if (offer.user.id !== userId && preparedOffer.hidden) {
+        preparedOffer.amount = 0;
+      }
+
       return preparedOffer;
     });
   } else {
@@ -90,7 +120,13 @@ function prepareOffersForRes(offers: Offer[]): TOffer[] {
   return preparedOffers;
 }
 
-function prepareWishlistsForRes(wishlists: Wishlist[]): TWishlist[] {
+function prepareWishlistsForRes({
+  wishlists,
+  userId,
+}: {
+  wishlists: Wishlist[];
+  userId: string;
+}): TWishlist[] {
   let preparedWishlists: TWishlist[];
   if (wishlists.length > 0) {
     preparedWishlists = wishlists.map((wishlist) => {
@@ -98,6 +134,7 @@ function prepareWishlistsForRes(wishlists: Wishlist[]): TWishlist[] {
 
       const preparedOwner = this.prepareUsersBaseForRes({
         users: [owner],
+        userId,
       })[0];
       const preparedItems = this.prepareWishesBaseForRes(items);
 
@@ -116,10 +153,10 @@ function prepareWishlistsForRes(wishlists: Wishlist[]): TWishlist[] {
 
 function prepareUsersBaseForRes({
   users,
-  withEmail = false,
+  userId,
 }: {
   users: User[];
-  withEmail?: boolean;
+  userId: string;
 }): TUserBase[] {
   let preparedUsers: TUserBase[];
   if (users.length > 0) {
@@ -127,7 +164,7 @@ function prepareUsersBaseForRes({
       const { password, wishes, offers, wishlists, email, ...preparedUser } =
         user;
 
-      if (withEmail) {
+      if (preparedUser.id === userId) {
         return { ...preparedUser, email };
       } else {
         return preparedUser;

@@ -53,7 +53,7 @@ export class UsersRepository {
     }
   }
 
-  async findOneBy({ id, username }: TFindUserByArgs): Promise<User> {
+  async findOneBy({ userId, username }: TFindUserByArgs): Promise<User> {
     try {
       const user: User = await this.repository.findOneOrFail({
         relations: [
@@ -63,7 +63,7 @@ export class UsersRepository {
           'offers',
           'wishlists',
         ],
-        where: [{ id }, { username }],
+        where: [{ id: userId }, { username }],
       });
       return user;
     } catch (err) {
@@ -111,9 +111,9 @@ export class UsersRepository {
     return wishes;
   }
 
-  async updateOne(id: string, dto: UpdateUserDto): Promise<User> {
-    await this.repository.update(id, dto);
-    const updatedUser = this.findOneBy({ id });
+  async updateOne(userId: string, dto: UpdateUserDto): Promise<User> {
+    await this.repository.update(userId, dto);
+    const updatedUser = this.findOneBy({ userId });
     return updatedUser;
   }
 

@@ -32,21 +32,24 @@ export class WishesController {
   }
 
   @Get('last')
-  async getLastWishes(): Promise<TWishFull[]> {
-    const res = await this.wishesService.findLast();
+  async getLastWishes(@Req() { user }: TUserReq): Promise<TWishFull[]> {
+    const res = await this.wishesService.findLast(user.id);
     return res;
   }
 
   @Get('top')
-  async getTopWishes(): Promise<TWishFull[]> {
-    const res = await this.wishesService.findTop();
+  async getTopWishes(@Req() { user }: TUserReq): Promise<TWishFull[]> {
+    const res = await this.wishesService.findTop(user.id);
     return res;
   }
 
   @UseGuards(GUARDS.jwtAuth)
   @Get(':id')
-  async getWish(@Param('id') id: string): Promise<TWishFull> {
-    const res = await this.wishesService.getWish(id);
+  async getWish(
+    @Param('id') id: string,
+    @Req() { user }: TUserReq,
+  ): Promise<TWishFull> {
+    const res = await this.wishesService.getWish(id, user.id);
     return res;
   }
 
