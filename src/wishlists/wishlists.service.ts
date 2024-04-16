@@ -1,20 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
 import { TWishlist } from '../utils/types';
 import { CommonMethods } from '../utils/common-methods';
 
+import { WishesRepository } from '../wishes/wishes.repository';
+import { UsersRepository } from '../users/users.repository';
+
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
-import { Wishlist } from './entities/wishlist.entity';
 import { WishlistsRepository } from './wishlists.repository';
-import { WishesRepository } from 'src/wishes/wishes.repository';
-import { UsersRepository } from 'src/users/users.repository';
 
 @Injectable()
 export class WishlistsService {
   constructor(
-    @InjectRepository(Wishlist)
     private readonly wishlistRepository: WishlistsRepository,
     private readonly usersRepository: UsersRepository,
     private readonly wishesRepository: WishesRepository,

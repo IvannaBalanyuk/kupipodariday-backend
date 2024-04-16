@@ -7,7 +7,7 @@ import { UsersService } from '../users/users.service';
 import { HashHelper } from '../hash/hash.helper';
 
 import { SignUpDto } from './dto/signup.dto';
-import { UsersRepository } from 'src/users/users.repository';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class AuthService {

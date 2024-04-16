@@ -36,7 +36,7 @@ export class WishesRepository {
     let wish: Wish;
     try {
       wish = await this.repository.findOne({
-        relations: { owner: true, offers: true },
+        relations: ['owner', 'offers', 'offers.user', 'offers.item'],
         where: { id },
       });
     } catch (err) {
@@ -52,7 +52,7 @@ export class WishesRepository {
 
   async findLast(): Promise<Wish[]> {
     const wishes: Wish[] = await this.repository.find({
-      relations: { owner: true, offers: true },
+      relations: ['owner', 'offers', 'offers.user', 'offers.item'],
       order: { createdAt: 'DESC' },
       take: 40,
     });
@@ -61,15 +61,16 @@ export class WishesRepository {
 
   async findTop(): Promise<Wish[]> {
     const wishes: Wish[] = await this.repository.find({
-      relations: { owner: true, offers: true },
+      relations: ['owner', 'offers', 'offers.user', 'offers.item'],
       order: { copied: 'desc' },
       take: 10,
     });
     return wishes;
   }
 
-  async findMany(wishIds: number[]): Promise<Wish[]> {
+  async findMany(wishIds: string[]): Promise<Wish[]> {
     return await this.repository.find({
+      relations: ['owner', 'offers', 'offers.user', 'offers.item'],
       where: { id: In(wishIds) },
     });
   }

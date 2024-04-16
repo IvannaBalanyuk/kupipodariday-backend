@@ -14,7 +14,7 @@ export class Wishlist extends CommonEntity {
   })
   name: string;
 
-  @Column()
+  @Column({ default: 'Описание отсутствует' })
   @IsString()
   @MaxLength(1500, {
     message: 'Допустимая длина поля description - не более 1500 символов',

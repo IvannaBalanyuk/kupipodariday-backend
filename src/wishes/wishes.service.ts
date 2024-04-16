@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { TWishFull } from '../utils/types';
 import { UsersRepository } from '../users/users.repository';
@@ -83,7 +87,7 @@ export class WishesService {
     return wishesForRes;
   }
 
-  async getWishes(wishIds: number[]): Promise<TWishFull[]> {
+  async getWishes(wishIds: string[]): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findMany(wishIds);
 
     // Подготовка объекта для ответа сервера:

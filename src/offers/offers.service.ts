@@ -1,5 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { TOffer } from '../utils/types';
 import { CommonMethods } from '../utils/common-methods';
@@ -8,19 +11,18 @@ import { WishesRepository } from '../wishes/wishes.repository';
 import { UpdateWishDto } from '../wishes/dto/update-wish.dto';
 
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { Offer } from './entities/offer.entity';
+
 import { OffersRepository } from './offers.repository';
 
 @Injectable()
 export class OffersService {
   constructor(
-    @InjectRepository(Offer)
     private readonly offersRepository: OffersRepository,
     private readonly wishesRepository: WishesRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async createOffer(userId: string, dto: CreateOfferDto): Promise<Offer> {
+  async createOffer(userId: string, dto: CreateOfferDto): Promise<TOffer> {
     try {
       const user = await this.usersRepository.findOneBy({ id: userId });
       const wish = await this.wishesRepository.findOne(dto.itemId);
@@ -34,13 +36,13 @@ export class OffersService {
       });
 
       const createdOffer = await this.offersRepository.create(dto, user, wish);
-      console.log('createdOffer', createdOffer);
 
       await this.wishesRepository.update(dto.itemId, {
         raised: wish.raised + dto.amount,
       } as UpdateWishDto);
 
-      return createdOffer;
+      const offerForRes = CommonMethods.prepareOffersForRes([createdOffer])[0];
+      return offerForRes;
     } catch (err) {
       return err;
     }
@@ -48,12 +50,22 @@ export class OffersService {
 
   async getOffer(id: string): Promise<TOffer> {
     const offer = await this.offersRepository.findOne(id);
+
+    if (!offer) {
+      throw new BadRequestException('Оффер с таким id не найден');
+    }
+
     const offerForRes = CommonMethods.prepareOffersForRes([offer])[0];
     return offerForRes;
   }
 
   async getOffers(): Promise<TOffer[]> {
     const offers = await this.offersRepository.findAll();
+
+    if (!offers) {
+      throw new BadRequestException('Не найдено ни одного оффера');
+    }
+
     const offersForRes = CommonMethods.prepareOffersForRes(offers);
     return offersForRes;
   }

@@ -1,6 +1,5 @@
 import {
   IsArray,
-  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -29,6 +28,5 @@ export class CreateWishlistDto {
   image: string;
 
   @IsArray()
-  @IsNumber({}, { each: true })
-  itemsId: number[];
+  itemsId: string[];
 }

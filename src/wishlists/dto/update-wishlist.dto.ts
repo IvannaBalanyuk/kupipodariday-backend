@@ -1,6 +1,5 @@
 import {
   IsArray,
-  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -31,7 +30,6 @@ export class UpdateWishlistDto {
   image: string;
 
   @IsArray()
-  @IsNumber({}, { each: true })
   @IsOptional()
-  itemsId: number[];
+  itemsId: string[];
 }

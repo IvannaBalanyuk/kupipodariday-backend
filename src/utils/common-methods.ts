@@ -51,7 +51,6 @@ function prepareWishesForRes(wishes: Wish[]): TWishFull[] {
   if (wishes.length > 0) {
     preparedWishes = wishes.map((wish) => {
       const { owner, offers, ...rest } = wish;
-
       const preparedOwner = this.prepareUsersBaseForRes({
         users: [owner],
       })[0];
@@ -75,7 +74,6 @@ function prepareOffersForRes(offers: Offer[]): TOffer[] {
   if (offers instanceof Array && offers.length > 0) {
     preparedOffers = offers.map((offer) => {
       const { user, item, ...rest } = offer;
-
       const preparedUser = this.prepareUsersBaseForRes({ users: [user] })[0];
       const preparedItem = this.prepareWishesBaseForRes([item])[0];
 

@@ -98,7 +98,14 @@ export class UsersRepository {
   async findUserWishes(username: string): Promise<Wish[]> {
     const { wishes } = await this.repository.findOne({
       select: ['wishes'],
-      relations: ['wishes', 'wishes.owner', 'wishes.offers', 'wishlists'],
+      relations: [
+        'wishes',
+        'wishes.owner',
+        'wishes.offers',
+        'wishes.offers.user',
+        'wishes.offers.item',
+        'wishlists',
+      ],
       where: { username },
     });
     return wishes;
