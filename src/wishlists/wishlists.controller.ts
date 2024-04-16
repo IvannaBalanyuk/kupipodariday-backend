@@ -9,6 +9,7 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { GUARDS } from '../auth/guards';
 import { TUserReq, TWishlist } from '../utils/types';
@@ -17,6 +18,8 @@ import { WishlistsService } from './wishlists.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
+@ApiTags('Wishlists')
+@ApiBearerAuth()
 @UseGuards(GUARDS.jwtAuth)
 @Controller('wishlistlists')
 export class WishlistsController {

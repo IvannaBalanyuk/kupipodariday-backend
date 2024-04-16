@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { GUARDS } from '../auth/guards';
 import { TUserReq, TUserBase, TWishFull } from '../utils/types';
@@ -16,6 +17,8 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @UseGuards(GUARDS.jwtAuth)
 @Controller('users')
 export class UsersController {

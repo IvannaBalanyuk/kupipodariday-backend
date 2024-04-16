@@ -9,7 +9,7 @@ import {
 
 export class CreateOfferDto {
   @IsString()
-  @ApiProperty({ example: '3f72e4a9-af8c-49d1-9f2c-3587a4605c51' })
+  @ApiProperty({ example: 'ab0381c3-57cd-45c0-97bd-fbd50fd996c5' })
   itemId: string;
 
   @IsNumber()

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNumber,
   IsOptional,
@@ -14,18 +15,29 @@ export class UpdateWishDto {
     message: 'Допустимая длина поля name - не более 250 символов',
   })
   @IsOptional()
+  @ApiProperty({
+    example: 'Стивен Кинг "Стрелок. Извлечение троих. Бесплодные земли"',
+  })
   name: string;
 
   @IsUrl({
     message: 'Допустимое значение поля link - валидный url',
   })
   @IsOptional()
+  @ApiProperty({
+    example:
+      'https://www.chitai-gorod.ru/product/strelok-izvlechenie-troih-besplodnye-zemli-2788173?productShelf&shelfIndex=0&productIndex=3',
+  })
   link: string;
 
   @IsUrl({
     message: 'Допустимое значение поля image - валидный url',
   })
   @IsOptional()
+  @ApiProperty({
+    example:
+      'https://content.img-gorod.ru/nomenclature/27/881/2788173.jpg?width=0&height=1200&fit=bounds',
+  })
   image: string;
 
   @IsNumber(
@@ -37,6 +49,7 @@ export class UpdateWishDto {
   )
   @IsPositive()
   @IsOptional()
+  @ApiProperty({ example: 10 })
   price: number;
 
   @IsString()
@@ -44,15 +57,21 @@ export class UpdateWishDto {
     message: 'Допустимая длина поля description - не более 1024 символов',
   })
   @IsOptional()
+  @ApiProperty({
+    example:
+      'Юный Роланд — последний благородный рыцарь в мире, «сдвинувшемся с места». Ему во что бы то ни стало нужно найти Темную Башню — средоточие Силы, краеугольный камень мироздания.',
+  })
   description: string;
 
   @IsNumber()
   @Min(0)
   @IsOptional()
+  @ApiProperty({ example: 2 })
   copied?: number;
 
   @IsNumber()
   @Min(0)
   @IsOptional()
+  @ApiProperty({ example: 30 })
   raised?: number;
 }

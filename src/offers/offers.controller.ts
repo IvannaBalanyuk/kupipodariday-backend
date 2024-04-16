@@ -7,6 +7,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { GUARDS } from '../auth/guards';
 import { TOffer, TUserReq } from '../utils/types';
@@ -14,6 +15,8 @@ import { TOffer, TUserReq } from '../utils/types';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 
+@ApiTags('Offers')
+@ApiBearerAuth()
 @UseGuards(GUARDS.jwtAuth)
 @Controller('offers')
 export class OffersController {

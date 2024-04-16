@@ -21,13 +21,12 @@ export class ColumnNumericTransformer {
 }
 
 // Функции для подготовки данных к отправке на клиент
-
 function prepareUserForRes({
   users,
   userId,
 }: {
   users: User[];
-  userId: string;
+  userId?: string;
 }): TUserFull[] {
   let preparedUsers: TUserFull[];
   if (users.length > 0) {
@@ -58,9 +57,11 @@ function prepareUserForRes({
 function prepareWishesForRes({
   wishes,
   userId,
+  isPublic = false,
 }: {
   wishes: Wish[];
-  userId: string;
+  userId?: string;
+  isPublic?: boolean;
 }): TWishFull[] {
   let preparedWishes: TWishFull[];
   if (wishes.length > 0) {
@@ -70,7 +71,11 @@ function prepareWishesForRes({
         users: [owner],
         userId,
       })[0];
-      const preparedOffers = this.prepareOffersForRes({ offers, userId });
+      const preparedOffers = this.prepareOffersForRes({
+        offers,
+        userId,
+        isPublic,
+      });
 
       const preparedWish = {
         ...rest,
@@ -88,9 +93,11 @@ function prepareWishesForRes({
 function prepareOffersForRes({
   offers,
   userId,
+  isPublic = false,
 }: {
   offers: Offer[];
-  userId: string;
+  userId?: string;
+  isPublic?: boolean;
 }): TOffer[] {
   let preparedOffers: TOffer[];
   if (offers instanceof Array && offers.length > 0) {
@@ -108,7 +115,10 @@ function prepareOffersForRes({
         item: preparedItem,
       };
 
-      if (offer.user.id !== userId && preparedOffer.hidden) {
+      if (
+        isPublic ||
+        (userId && offer.user.id !== userId && preparedOffer.hidden)
+      ) {
         preparedOffer.amount = 0;
       }
 
@@ -125,7 +135,7 @@ function prepareWishlistsForRes({
   userId,
 }: {
   wishlists: Wishlist[];
-  userId: string;
+  userId?: string;
 }): TWishlist[] {
   let preparedWishlists: TWishlist[];
   if (wishlists.length > 0) {
@@ -156,7 +166,7 @@ function prepareUsersBaseForRes({
   userId,
 }: {
   users: User[];
-  userId: string;
+  userId?: string;
 }): TUserBase[] {
   let preparedUsers: TUserBase[];
   if (users.length > 0) {
@@ -164,7 +174,7 @@ function prepareUsersBaseForRes({
       const { password, wishes, offers, wishlists, email, ...preparedUser } =
         user;
 
-      if (preparedUser.id === userId) {
+      if (userId && preparedUser.id === userId) {
         return { ...preparedUser, email };
       } else {
         return preparedUser;

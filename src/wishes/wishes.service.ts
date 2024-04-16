@@ -72,17 +72,20 @@ export class WishesService {
     }
   }
 
-  async findLast(userId: string): Promise<TWishFull[]> {
+  async findLast(): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findLast();
 
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
-      return CommonMethods.prepareWishesForRes({ wishes: [wish], userId })[0];
+      return CommonMethods.prepareWishesForRes({
+        wishes: [wish],
+        isPublic: true,
+      })[0];
     });
     return wishesForRes;
   }
 
-  async findTop(userId: string): Promise<TWishFull[]> {
+  async findTop(): Promise<TWishFull[]> {
     const wishes = await this.wishesRepository.findTop();
 
     if (!wishes) {
@@ -91,7 +94,10 @@ export class WishesService {
 
     // Подготовка объекта для ответа сервера:
     const wishesForRes = wishes.map((wish) => {
-      return CommonMethods.prepareWishesForRes({ wishes: [wish], userId })[0];
+      return CommonMethods.prepareWishesForRes({
+        wishes: [wish],
+        isPublic: true,
+      })[0];
     });
     return wishesForRes;
   }
