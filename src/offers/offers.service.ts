@@ -8,7 +8,6 @@ import { TOffer } from '../utils/types';
 import { CommonMethods } from '../utils/common-methods';
 import { UsersRepository } from '../users/users.repository';
 import { WishesRepository } from '../wishes/wishes.repository';
-import { UpdateWishDto } from '../wishes/dto/update-wish.dto';
 
 import { CreateOfferDto } from './dto/create-offer.dto';
 
@@ -36,10 +35,6 @@ export class OffersService {
       });
 
       const createdOffer = await this.offersRepository.create(dto, user, wish);
-
-      await this.wishesRepository.update(dto.itemId, {
-        raised: wish.raised + dto.amount,
-      } as UpdateWishDto);
 
       const offerForRes = CommonMethods.prepareOffersForRes({
         offers: [createdOffer],

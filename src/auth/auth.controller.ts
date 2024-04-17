@@ -6,6 +6,7 @@ import { TJwtPayload, TToken, TUserBase } from '../utils/types';
 import { AuthService } from './auth.service';
 import { GUARDS } from './guards';
 import { SignUpDto } from './dto/signup.dto';
+import { SignInDto } from './dto/signin.dto';
 
 @ApiTags('Auth')
 @Controller()
@@ -20,7 +21,10 @@ export class AuthController {
 
   @UseGuards(GUARDS.localAuth)
   @Post('signin')
-  async signin(@Req() req: { user: TJwtPayload }): Promise<TToken> {
+  async signin(
+    @Body() dto: SignInDto,
+    @Req() req: { user: TJwtPayload },
+  ): Promise<TToken> {
     const token = await this.authService.signin(req.user);
     return token;
   }
