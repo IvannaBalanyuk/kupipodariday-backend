@@ -1,11 +1,5 @@
 # КупиПодариДай
 
-API сервиса вишлистов.
-Написан с применением фреймворка NestJS.
-Для хранения данных использована реляционная база данных (СУБД - PostgreSQL).
-
-# КупиПодариДай
-
 RESTful API сервиса вишлистов.
 
 ## Функционал сервиса:
@@ -33,5 +27,5 @@ npm i
 npm run start:dev
 ```
 
-## Документация:
-Доступна на [http://localhost:3001/api](http://localhost:3001/api) (OpenAPI, Swagger)
+## Документация OpenAPI:
+Доступна на [http://localhost:3001/api](http://localhost:3001/api) (Swagger)
